@@ -67,6 +67,26 @@ describe('Checkbox', () => {
     expect(actual).toMatchSnapshot();
   });
 
+  describe('tests with custom globals', () => {
+    /* eslint-disable no-console */
+    const warn = jest.fn();
+    const oldWarn = console.warn;
+    const oldEnv = process.env.NODE_ENV;
+    beforeAll(() => {
+      console.warn = warn;
+      process.env.NODE_ENV = 'other';
+    });
+    afterAll(() => {
+      console.warn = oldWarn;
+      process.env.NODE_ENV = oldEnv;
+    });
+
+    it('should deprecate the nomargin', () => {
+      create(<Checkbox {...defaultProps} />);
+      expect(warn).toBeCalledTimes(1);
+    });
+  });
+
   /**
    * Logic tests.
    */
