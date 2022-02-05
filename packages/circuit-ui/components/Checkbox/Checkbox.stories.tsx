@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { useState, ChangeEvent, Fragment } from 'react';
+import { useState, ChangeEvent, Fragment, forwardRef } from 'react';
 import { action } from '@storybook/addon-actions';
 import {
   InteractionTaskArgs,
@@ -55,22 +55,27 @@ export default {
   },
 };
 
-const CheckboxWithState = ({
-  checked: initial = false,
-  children,
-  ...props
-}: CheckboxProps) => {
-  const [checked, setChecked] = useState(initial);
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    action('Checkbox clicked')(event);
-    setChecked((prev) => !prev);
-  };
-  return (
-    <Checkbox {...props} checked={checked} onChange={handleChange} noMargin>
-      {children || (checked ? 'Checked' : 'Unchecked')}
-    </Checkbox>
-  );
-};
+// eslint-disable-next-line react/display-name
+const CheckboxWithState = forwardRef<HTMLInputElement, CheckboxProps>(
+  ({ checked: initial = false, children, ...props }, ref) => {
+    const [checked, setChecked] = useState(initial);
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+      action('Checkbox clicked')(event);
+      setChecked((prev) => !prev);
+    };
+    return (
+      <Checkbox
+        {...props}
+        ref={ref}
+        checked={checked}
+        onChange={handleChange}
+        noMargin
+      >
+        {children || (checked ? 'Checked' : 'Unchecked')}
+      </Checkbox>
+    );
+  },
+);
 
 export const Base = (args: CheckboxProps) => <CheckboxWithState {...args} />;
 
@@ -113,6 +118,22 @@ Disabled.args = {
   name: 'disabled',
   value: 'true',
   disabled: true,
+};
+export const Indeterminate = (args: CheckboxProps) => (
+  <CheckboxWithState
+    {...args}
+    ref={(el: HTMLInputElement) => {
+      if (el) {
+        // eslint-disable-next-line no-param-reassign
+        el.indeterminate = true;
+      }
+    }}
+  />
+);
+
+Indeterminate.args = {
+  name: 'indeterminate',
+  value: 'true',
 };
 
 export const Multiple = (args: CheckboxProps) => (

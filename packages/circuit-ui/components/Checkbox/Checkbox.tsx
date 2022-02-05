@@ -28,6 +28,8 @@ import { useClickEvent, TrackingProps } from '../../hooks/useClickEvent';
 import { deprecate } from '../../util/logger';
 import Tooltip from '../Tooltip';
 
+import { IndeterminateIcon } from './IndeterminateIcon';
+
 export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   /**
    * Triggers error styles on the component.
@@ -161,16 +163,19 @@ const inputBaseStyles = ({ theme }: StyleProps) => css`
     border-color: ${theme.colors.n500};
   }
 
-  &:checked:focus:not(:focus-visible) + label::before {
+  &:checked:focus:not(:focus-visible) + label::before,
+  &:indeterminate:focus:not(:focus-visible) + label::before {
     border-color: ${theme.colors.p500};
   }
 
-  &:checked + label > svg {
+  &:checked + label > svg[data-symbol='checked'],
+  &:indeterminate + label > svg[data-symbol='indeterminate'] {
     transform: translateY(-50%) scale(1, 1);
     opacity: 1;
   }
 
-  &:checked + label::before {
+  &:checked + label::before,
+  &:indeterminate + label::before {
     border-color: ${theme.colors.p500};
     background-color: ${theme.colors.p500};
   }
@@ -189,7 +194,8 @@ const inputInvalidStyles = ({ theme, invalid }: StyleProps & InputElProps) =>
       border-color: ${theme.colors.r700};
     }
 
-    &:checked + label::before {
+    &:checked + label::before,
+    &:indeterminate + label::before {
       border-color: ${theme.colors.danger};
       background-color: ${theme.colors.danger};
     }
@@ -260,7 +266,8 @@ export const Checkbox = forwardRef(
         />
         <CheckboxLabel htmlFor={id} disabled={disabled}>
           {children}
-          <Checkmark aria-hidden="true" />
+          <Checkmark aria-hidden="true" data-symbol="checked" />
+          <IndeterminateIcon aria-hidden="true" data-symbol="indeterminate" />
         </CheckboxLabel>
         {!disabled && validationHint && (
           <CheckboxTooltip position={'top'} align={'right'}>
